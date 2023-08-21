@@ -7,6 +7,12 @@ using namespace sc;
 
 int main(int argc, char** argv )
 {
+    static const int width = 640;
+    static const int height = 480;
+    unsigned char* img = sc::mainGL(width, height);
+ 
+    // cv::Mat image(height, width, CV_8UC3, img);
+
     // char* lenaPath = "C:/Users/rodol/vscodeProjects/a/lenna.png";
     // sc::test();
     // cv::Mat image;
@@ -28,9 +34,8 @@ int main(int argc, char** argv )
 
     // cv::Mat rebuild(imgRows, imgCols, CV_8UC3, imgData);
     // namedWindow("Display Image", WINDOW_AUTOSIZE );
-    // imshow("Display Image", rebuild);
+    // imshow("Display Image", image);
     // waitKey(0);
 
-    sc::mainGL();
     return 0;
 }

@@ -2,11 +2,16 @@
 
 #include <algorithm>
 #include <iostream>
+#include <fstream>
+#include <string>
+#include <sstream>
 // #include <opencv2/opencv.hpp>
 
 #define GLEW_STATIC
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+
+#define SHADER_PATH "C:/Users/rodol/vscodeProjects/cppImage/res/shaders/Basic.shader"
 
 using namespace std;
 
@@ -78,20 +83,59 @@ static int createShader(const string& vertexShader, const string& fragmentShader
     return program;
 }
 
-int sc::mainGL(void)
+struct ShaderSource {
+    string vertex;
+    string fragment;
+};
+
+static ShaderSource ParseShader(const string& filepath) {
+    ifstream strStream(filepath);
+    if (!strStream.is_open())
+        cout << "ERROR OPENING";    
+
+    enum class ShaderType{
+        NONE = -1, VERTEX = 0, FRAGMENT = 1
+    };
+
+    string line;
+    stringstream shaderStream[2];
+    ShaderType type = ShaderType::NONE;
+    while (getline(strStream, line)) {
+        if (line.find("#shader") != string::npos) {
+            if (line.find("vertex") != string::npos) {
+                type = ShaderType::VERTEX;
+            }
+            else if (line.find("fragment") != string::npos) {
+                type = ShaderType::FRAGMENT;
+            }
+            else {
+                ShaderType type = ShaderType::NONE;
+                // TODO: Handle error
+            }
+        }
+        else {
+            shaderStream[static_cast<int>(type)] << line << "\n";
+        }
+    }
+
+    return {shaderStream[static_cast<int>(ShaderType::VERTEX)].str(),
+            shaderStream[static_cast<int>(ShaderType::FRAGMENT)].str()};
+}
+
+unsigned char* sc::mainGL(int windowWidth, int windowHeight)
 {
     GLFWwindow* window;
 
     /* Initialize the library */
     if (!glfwInit())
-        return -1;
+        return nullptr;
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(windowWidth, windowHeight, "Hello World", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
-        return -1;
+        return nullptr;
     }
 
     /* Make the window's context current */
@@ -116,25 +160,9 @@ int sc::mainGL(void)
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
 
-    string vertexShader =
-        "#version 330 core\n"
-        "\n"
-        "layout(location = 0) in vec4 position;\n"
-        "\n"
-        "void main()\n"
-        "{\n"
-        "   gl_Position = position;\n"
-        "}\n";
-    string fragmentShader = 
-        "#version 330 core\n"
-        "\n"
-        "layout(location = 0) out vec4 color;\n"
-        "\n"
-        "void main() {\n"
-        "   color = vec4(1.0, 0.0, 0.0, 1.0);\n"
-        "}\n";
+    ShaderSource source = ParseShader(SHADER_PATH);
 
-    int shader = createShader(vertexShader, fragmentShader);
+    int shader = createShader(source.vertex, source.fragment);
     glUseProgram(shader);
 
     /* Loop until the user closes the window */
@@ -151,9 +179,14 @@ int sc::mainGL(void)
         /* Poll for and process events */
         glfwPollEvents();
     }
+    
+    // GLubyte* pixels = new GLubyte[windowWidth * windowHeight * 3];  // RGB format
+    // glReadPixels(0, 0, windowWidth, windowHeight, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 
+    glDeleteProgram(shader);
     glfwTerminate();
-    return 0;
+
+    return static_cast<unsigned char*>(pixels);
 }
 
 void sc::process(unsigned int image, int rows, int columns, int channels) {
