@@ -28,9 +28,11 @@ vec3 palette( in float t)
 void main() {
     vec2 fragCoord = gl_FragCoord.xy;
 
-    vec2 uv = (fragCoord * 2.0 - u_Resolution) / u_Resolution;
+    vec2 uv0 = (fragCoord * 2.0 - u_Resolution) / u_Resolution.y;
+    vec2 uv = uv0;
 
     float d = length(uv);
+    // """"HEART SHAPED"""""
     // float teta = atan(uv.y, uv.x);
     // if (teta < 0.0) {
     //     teta += 2.0 * 3.14159;
@@ -49,19 +51,39 @@ void main() {
 
     // color = vec4(FragColor, 1.0);
 
-    vec3 col = palette(d);
+    // REGULAR CIRCLE
+    // vec3 col = palette(d);
 
-    // d *= (1 - cos(8.0f * d + u_Color) / 8);
+    // d = sin(4.0f * d + u_Color) / 8;
+    // d = abs(d);
 
-    d = sin(4.0f * d + u_Color) / 8;
-    d = abs(d);
-
-    d = smoothstep(0.0f, 0.1f, d);
+    // d = smoothstep(0.0f, 0.1f, d);
     
-    d = 0.4 / d;
+    // d = 0.4 / d;
     
 
-    col *= d;
+    // col *= d;
 
-    color = vec4(col, 1.0);
+    // color = vec4(col, 1.0);
+
+    // CRAZY FRACTAL
+    vec3 finalColor = vec3(0.0);
+    for (float i = 0; i < 4; i++) {
+        uv = 1.7 * uv;
+        uv = fract(uv);
+        uv -= 0.5;
+        d = length(uv);
+        vec3 col = palette(length(uv0) + u_Color / (2 * i + 2));
+
+        d = sin(8.0f * d + u_Color * (i + 1) / 4) / 8;
+        d = abs(d);
+
+        // d = smoothstep(0.0f, 0.1f, d);
+        
+        // d = pow(0.01 / d, 1.2);
+        d = pow(d, 0.6);
+        
+        finalColor += col * d;
+    }
+    color = vec4(finalColor, 1.0);
 };
