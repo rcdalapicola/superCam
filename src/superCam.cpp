@@ -146,19 +146,30 @@ unsigned char* sc::mainGL(int windowWidth, int windowHeight)
         cout << "GLEW NOT INITIALIZED!" << endl;
     }
 
-    float positions[] = {
+    float vertexes[] = {
         -0.5f, -0.5f,
-        0, 0.5f,
-        0.5f, -0.5f
+        0.5f, 0.5f,
+        0.5f, -0.5f,
+        -0.5f, 0.5f,
+    };
+
+    unsigned int indexes[] = {
+        0, 1, 2,
+        0, 3, 1
     };
 
     unsigned int buffId;
     glGenBuffers(1, &buffId);
     glBindBuffer(GL_ARRAY_BUFFER, buffId);
-    glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), positions, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 4 * 2 * sizeof(float), vertexes, GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
+
+    unsigned int indexBufferObject;
+    glGenBuffers(1, &indexBufferObject);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferObject);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(float), indexes, GL_STATIC_DRAW);
 
     ShaderSource source = ParseShader(SHADER_PATH);
 
@@ -171,7 +182,7 @@ unsigned char* sc::mainGL(int windowWidth, int windowHeight)
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
@@ -186,7 +197,7 @@ unsigned char* sc::mainGL(int windowWidth, int windowHeight)
     glDeleteProgram(shader);
     glfwTerminate();
 
-    return static_cast<unsigned char*>(pixels);
+    return nullptr;//static_cast<unsigned char*>(pixels);
 }
 
 void sc::process(unsigned int image, int rows, int columns, int channels) {

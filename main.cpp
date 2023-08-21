@@ -8,7 +8,7 @@ using namespace sc;
 int main(int argc, char** argv )
 {
     static const int width = 640;
-    static const int height = 480;
+    static const int height = 640;
     unsigned char* img = sc::mainGL(width, height);
  
     // cv::Mat image(height, width, CV_8UC3, img);
