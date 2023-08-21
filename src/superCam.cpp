@@ -80,6 +80,12 @@ static int createShader(const string& vertexShader, const string& fragmentShader
     glDeleteShader(vs);
     glDeleteShader(fs);
 
+    GLint fragCoordLocation = glGetUniformLocation(program, "FragCoord");
+    glUniform2f(fragCoordLocation, 0.0f, 0.0f); // Set actual fragment coordinates
+
+    GLint resolutionLocation = glGetUniformLocation(program, "resolution");
+    glUniform2f(resolutionLocation, 800.0f, 600.0f); // Set actual resolution
+
     return program;
 }
 
@@ -140,6 +146,7 @@ unsigned char* sc::mainGL(int windowWidth, int windowHeight)
 
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
+    glfwSwapInterval(1);
 
     if (glewInit() != GLEW_OK)
     {
@@ -147,10 +154,10 @@ unsigned char* sc::mainGL(int windowWidth, int windowHeight)
     }
 
     float vertexes[] = {
-        -0.5f, -0.5f,
-        0.5f, 0.5f,
-        0.5f, -0.5f,
-        -0.5f, 0.5f,
+        -1.0f, -1.0f,
+        1.0f, 1.0f,
+        1.0f, -1.0f,
+        -1.0f, 1.0f,
     };
 
     unsigned int indexes[] = {
@@ -175,14 +182,29 @@ unsigned char* sc::mainGL(int windowWidth, int windowHeight)
 
     int shader = createShader(source.vertex, source.fragment);
     glUseProgram(shader);
+    
+    int location = glGetUniformLocation(shader, "u_Resolution");
+    glUniform2f(location, windowWidth, windowHeight);
 
+    int colorLocation = glGetUniformLocation(shader, "u_Color");
+
+    float r = 0.0f;
+    static const float increment = 0.01f;
+    float step = increment;
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
+        glUniform1f(colorLocation, r);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+    
+        // if (r >= 1.0f)
+        //     step = -increment;
+        // else if (r <= 0.0f)
+        //     step = increment;
+        r += step;
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
