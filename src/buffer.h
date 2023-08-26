@@ -1,5 +1,5 @@
-#ifndef SHADER_HPP
-#define SHADER_HPP
+#ifndef SHADER_H
+#define SHADER_H
 
 #define GLEW_STATIC
 #include <GL/glew.h>
@@ -26,4 +26,4 @@ class IndexBuffer : public Buffer {
         IndexBuffer();
 };
 
-#endif //SHADER_HPP
+#endif //SHADER_H

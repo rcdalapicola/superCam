@@ -1,3 +1,7 @@
+#define GLEW_STATIC
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+
 #include "superCam.h"
 
 #include <algorithm>
@@ -7,11 +11,8 @@
 #include <sstream>
 // #include <opencv2/opencv.hpp>
 
-#define GLEW_STATIC
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-
-#include "buffer.hpp"
+#include "buffer.h"
+#include "glfwContext.h"
 
 #define SHADER_PATH "C:/Users/rodol/vscodeProjects/cppImage/res/shaders/Basic.shader"
 
@@ -132,28 +133,10 @@ static ShaderSource ParseShader(const string& filepath) {
 
 unsigned char* sc::mainGL(int windowWidth, int windowHeight)
 {
-    GLFWwindow* window;
-
-    /* Initialize the library */
-    if (!glfwInit())
-        return nullptr;
-
-    /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(windowWidth, windowHeight, "Hello World", NULL, NULL);
-    if (!window)
-    {
-        glfwTerminate();
-        return nullptr;
-    }
-
-    /* Make the window's context current */
-    glfwMakeContextCurrent(window);
-    glfwSwapInterval(1);
-
-    if (glewInit() != GLEW_OK)
-    {
-        cout << "GLEW NOT INITIALIZED!" << endl;
-    }
+    glfwContext context;
+    
+    context.newWindow(windowWidth, windowHeight);
+    context.setSwapInterval(1);
 
     float vertexes[] = {
         -1.0f, -1.0f,
@@ -161,22 +144,24 @@ unsigned char* sc::mainGL(int windowWidth, int windowHeight)
         1.0f, -1.0f,
         -1.0f, 1.0f,
     };
+    const int vertexesElements = 4 * 2;
 
     unsigned int indexes[] = {
         0, 1, 2,
         0, 3, 1
     };
+    const int indexesElements =6;
 
     Buffer vertexesBuffer;
     vertexesBuffer.bind();
-    vertexesBuffer.data(4 * 2 * 2 * sizeof(float), vertexes);
+    vertexesBuffer.data(vertexesElements * sizeof(float), vertexes);
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
 
     IndexBuffer indexesBuffer;
     indexesBuffer.bind();
-    indexesBuffer.data(6 * sizeof(float), indexes);
+    indexesBuffer.data(indexesElements * sizeof(float), indexes);
 
     ShaderSource source = ParseShader(SHADER_PATH);
 
@@ -192,7 +177,7 @@ unsigned char* sc::mainGL(int windowWidth, int windowHeight)
     static const float increment = 0.01f;
     float step = increment;
     /* Loop until the user closes the window */
-    while (!glfwWindowShouldClose(window))
+    while (context.isWindowOpen())
     {
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
@@ -206,11 +191,7 @@ unsigned char* sc::mainGL(int windowWidth, int windowHeight)
         //     step = increment;
         r += step;
 
-        /* Swap front and back buffers */
-        glfwSwapBuffers(window);
-
-        /* Poll for and process events */
-        glfwPollEvents();
+        context.process();
     }
     
     GLubyte* pixels = new GLubyte[windowWidth * windowHeight * 3];  // RGB format

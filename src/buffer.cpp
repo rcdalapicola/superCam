@@ -1,4 +1,4 @@
-#include "buffer.hpp"
+#include "buffer.h"
 
 
 Buffer::Buffer() : arrayType(GL_ARRAY_BUFFER), id(0) {
