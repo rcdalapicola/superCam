@@ -11,6 +11,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "buffer.hpp"
+
 #define SHADER_PATH "C:/Users/rodol/vscodeProjects/cppImage/res/shaders/Basic.shader"
 
 using namespace std;
@@ -165,18 +167,16 @@ unsigned char* sc::mainGL(int windowWidth, int windowHeight)
         0, 3, 1
     };
 
-    unsigned int buffId;
-    glGenBuffers(1, &buffId);
-    glBindBuffer(GL_ARRAY_BUFFER, buffId);
-    glBufferData(GL_ARRAY_BUFFER, 4 * 2 * sizeof(float), vertexes, GL_STATIC_DRAW);
+    Buffer vertexesBuffer;
+    vertexesBuffer.bind();
+    vertexesBuffer.data(4 * 2 * 2 * sizeof(float), vertexes);
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
 
-    unsigned int indexBufferObject;
-    glGenBuffers(1, &indexBufferObject);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferObject);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(float), indexes, GL_STATIC_DRAW);
+    IndexBuffer indexesBuffer;
+    indexesBuffer.bind();
+    indexesBuffer.data(6 * sizeof(float), indexes);
 
     ShaderSource source = ParseShader(SHADER_PATH);
 
@@ -213,13 +213,13 @@ unsigned char* sc::mainGL(int windowWidth, int windowHeight)
         glfwPollEvents();
     }
     
-    // GLubyte* pixels = new GLubyte[windowWidth * windowHeight * 3];  // RGB format
-    // glReadPixels(0, 0, windowWidth, windowHeight, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+    GLubyte* pixels = new GLubyte[windowWidth * windowHeight * 3];  // RGB format
+    glReadPixels(0, 0, windowWidth, windowHeight, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 
     glDeleteProgram(shader);
     glfwTerminate();
 
-    return nullptr;//static_cast<unsigned char*>(pixels);
+    return static_cast<unsigned char*>(pixels);
 }
 
 void sc::process(unsigned int image, int rows, int columns, int channels) {

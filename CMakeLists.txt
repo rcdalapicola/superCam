@@ -11,7 +11,7 @@ include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/src )
 include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/GLFW/include )
 include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/GLEW/include )
 
-add_library(superCam ${CMAKE_CURRENT_SOURCE_DIR}/src/superCam.cpp)
+add_library(superCam ${CMAKE_CURRENT_SOURCE_DIR}/src/superCam.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/buffer.cpp)
 add_executable(${PROJECT_NAME} main.cpp)
 
 target_link_libraries( ${PROJECT_NAME} ${OpenCV_LIBS} )

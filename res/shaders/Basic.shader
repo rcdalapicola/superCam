@@ -80,8 +80,8 @@ void main() {
 
         // d = smoothstep(0.0f, 0.1f, d);
         
-        // d = pow(0.01 / d, 1.2);
-        d = pow(d, 0.6);
+        d = pow(0.01 / d, 1.2);
+        // d = pow(d, 0.6);
         
         finalColor += col * d;
     }
