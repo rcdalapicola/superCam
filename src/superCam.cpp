@@ -18,36 +18,6 @@
 
 using namespace std;
 
-void sc::test() {
-    std::cout << "Testing Supercam!" << std::endl;
-}
-
-bool _compareString(const string& str1, const string& str2) {
-    return strcmp(str1.c_str(), str2.c_str()) > 0 ? false : true;
-}
-
-void sc::sortString(std::vector<std::string>& inputList) {
-    auto inputSize = inputList.size();
-    // std::string** orderedList = new string*[inputSize];
-    cout << "Size: " << inputList.size();
-    // orderedList[0] = &inputList[0];
-    // for (int inputIndex = 1; inputIndex < inputSize; ++inputIndex) {
-    //     int orderedIndex = 0;
-    //     for (; orderedIndex < inputIndex; ++orderedIndex) {
-
-    //     }
-    // }
-
-    sort(inputList.begin(), inputList.end(), _compareString);
-}
-
-void sc::printStrings(const std::vector<std::string>& inputList) {
-    cout << "String list: ";
-    for (const string& str: inputList) {
-        cout << str << "; ";
-    }
-    cout << endl;
-}
 
 static int compileShader(unsigned int type, const string& source) {
     unsigned int id = glCreateShader(type);
