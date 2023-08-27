@@ -1,5 +1,5 @@
-#ifndef SHADER_H
-#define SHADER_H
+#ifndef BUFFER_H
+#define BUFFER_H
 
 #define GLEW_STATIC
 #include <GL/glew.h>
@@ -14,9 +14,9 @@ class Buffer {
     public:
         Buffer();
 
-        // virtual ~Buffer();
-
         void bind();
+
+        void unbind();
 
         void data(size_t size, const void* data);
 };
@@ -26,4 +26,4 @@ class IndexBuffer : public Buffer {
         IndexBuffer();
 };
 
-#endif //SHADER_H
+#endif //BUFFER_H

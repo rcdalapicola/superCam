@@ -13,8 +13,12 @@ IndexBuffer::IndexBuffer() : Buffer(GL_ELEMENT_ARRAY_BUFFER)
 {
 };
 
-void Buffer::bind(){
+void Buffer::bind() {
     glBindBuffer(arrayType, id);
+};
+
+void Buffer::unbind() {
+    glBindBuffer(arrayType, 0);
 };
 
 void Buffer::data(size_t size, const void* data) {

@@ -13,93 +13,10 @@
 
 #include "buffer.h"
 #include "glfwContext.h"
-
-#define SHADER_PATH "C:/Users/rodol/vscodeProjects/cppImage/res/shaders/Basic.shader"
+#include "shader.h"
 
 using namespace std;
 
-
-static int compileShader(unsigned int type, const string& source) {
-    unsigned int id = glCreateShader(type);
-    const char* src = source.c_str();
-    glShaderSource(id, 1, &src, nullptr);
-    glCompileShader(id);
-
-    int result;
-    glGetShaderiv(id, GL_COMPILE_STATUS, &result);
-    if (result == GL_FALSE) {
-        int length;
-        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
-        char* message = (char*)alloca(length * sizeof(char));
-        glGetShaderInfoLog(id, length, &length, message);
-        cout << "Failed to compile!" << endl;
-        cout << message << endl;
-        glDeleteShader(id);
-    }
-
-    return id;
-}
-
-static int createShader(const string& vertexShader, const string& fragmentShader) {
-    unsigned int program = glCreateProgram();
-    unsigned int vs = compileShader(GL_VERTEX_SHADER, vertexShader);
-    unsigned int fs = compileShader(GL_FRAGMENT_SHADER, fragmentShader);
-
-    glAttachShader(program, vs);
-    glAttachShader(program, fs);
-    glLinkProgram(program);
-    glValidateProgram(program);
-
-    glDeleteShader(vs);
-    glDeleteShader(fs);
-
-    GLint fragCoordLocation = glGetUniformLocation(program, "FragCoord");
-    glUniform2f(fragCoordLocation, 0.0f, 0.0f); // Set actual fragment coordinates
-
-    GLint resolutionLocation = glGetUniformLocation(program, "resolution");
-    glUniform2f(resolutionLocation, 800.0f, 600.0f); // Set actual resolution
-
-    return program;
-}
-
-struct ShaderSource {
-    string vertex;
-    string fragment;
-};
-
-static ShaderSource ParseShader(const string& filepath) {
-    ifstream strStream(filepath);
-    if (!strStream.is_open())
-        cout << "ERROR OPENING";    
-
-    enum class ShaderType{
-        NONE = -1, VERTEX = 0, FRAGMENT = 1
-    };
-
-    string line;
-    stringstream shaderStream[2];
-    ShaderType type = ShaderType::NONE;
-    while (getline(strStream, line)) {
-        if (line.find("#shader") != string::npos) {
-            if (line.find("vertex") != string::npos) {
-                type = ShaderType::VERTEX;
-            }
-            else if (line.find("fragment") != string::npos) {
-                type = ShaderType::FRAGMENT;
-            }
-            else {
-                ShaderType type = ShaderType::NONE;
-                // TODO: Handle error
-            }
-        }
-        else {
-            shaderStream[static_cast<int>(type)] << line << "\n";
-        }
-    }
-
-    return {shaderStream[static_cast<int>(ShaderType::VERTEX)].str(),
-            shaderStream[static_cast<int>(ShaderType::FRAGMENT)].str()};
-}
 
 unsigned char* sc::mainGL(int windowWidth, int windowHeight)
 {
@@ -133,15 +50,13 @@ unsigned char* sc::mainGL(int windowWidth, int windowHeight)
     indexesBuffer.bind();
     indexesBuffer.data(indexesElements * sizeof(float), indexes);
 
-    ShaderSource source = ParseShader(SHADER_PATH);
-
-    int shader = createShader(source.vertex, source.fragment);
-    glUseProgram(shader);
+    Shader shader(VertexShaderPath::BASIC, FragmentShaderPath::CIRCLE);
+    shader.bind();
     
-    int location = glGetUniformLocation(shader, "u_Resolution");
+    int location = glGetUniformLocation(shader.m_program, "u_Resolution");
     glUniform2f(location, windowWidth, windowHeight);
 
-    int colorLocation = glGetUniformLocation(shader, "u_Color");
+    int colorLocation = glGetUniformLocation(shader.m_program, "u_Color");
 
     float r = 0.0f;
     static const float increment = 0.01f;
@@ -155,10 +70,6 @@ unsigned char* sc::mainGL(int windowWidth, int windowHeight)
         glUniform1f(colorLocation, r);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
     
-        // if (r >= 1.0f)
-        //     step = -increment;
-        // else if (r <= 0.0f)
-        //     step = increment;
         r += step;
 
         context.process();
@@ -166,9 +77,6 @@ unsigned char* sc::mainGL(int windowWidth, int windowHeight)
     
     GLubyte* pixels = new GLubyte[windowWidth * windowHeight * 3];  // RGB format
     glReadPixels(0, 0, windowWidth, windowHeight, GL_RGB, GL_UNSIGNED_BYTE, pixels);
-
-    glDeleteProgram(shader);
-    glfwTerminate();
 
     return static_cast<unsigned char*>(pixels);
 }
