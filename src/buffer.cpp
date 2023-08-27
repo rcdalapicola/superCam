@@ -5,6 +5,7 @@ Buffer::Buffer() : arrayType(GL_ARRAY_BUFFER), id(0) {
     glGenBuffers(1, &id);
     bind();
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
 };
 
 Buffer::Buffer(GLenum p_arrayType) : arrayType(p_arrayType), id(0) {

@@ -42,8 +42,6 @@ unsigned char* sc::mainGL(int windowWidth, int windowHeight)
     Buffer vertexesBuffer;
     vertexesBuffer.data(vertexesElements * sizeof(float), vertexes);
 
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
-
     IndexBuffer indexesBuffer;
     indexesBuffer.data(indexesElements * sizeof(float), indexes);
 
@@ -51,7 +49,7 @@ unsigned char* sc::mainGL(int windowWidth, int windowHeight)
     shader.bind();
     
     auto resolution = shader.bindVariable("u_Resolution");
-    shader.uniform2f(resolution, windowWidth, windowHeight);
+    shader.uniform2f(resolution, static_cast<float>(windowWidth), static_cast<float>(windowHeight));
 
     auto color = shader.bindVariable("u_Color");
 
@@ -62,10 +60,10 @@ unsigned char* sc::mainGL(int windowWidth, int windowHeight)
     while (context.isWindowOpen())
     {
         /* Render here */
-        glClear(GL_COLOR_BUFFER_BIT);
+        context.clear();
 
         shader.uniform1f(color, r);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+        context.render(6);
     
         r += step;
 

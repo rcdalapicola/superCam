@@ -19,6 +19,8 @@ class glfwContext final{
         bool isWindowOpen();
         void process();
         unsigned char* getImage();
+        void render(int vertexesToRender);
+        void clear();
 };
 
 #endif // GLFWCONTEXT_H

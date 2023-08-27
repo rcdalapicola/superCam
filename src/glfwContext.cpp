@@ -56,3 +56,11 @@ unsigned char* glfwContext::getImage() {
 
     return pixels;
 }
+
+void glfwContext::clear() {
+    glClear(GL_COLOR_BUFFER_BIT);
+}
+
+void glfwContext::render(int vertexesToRender) {
+    glDrawElements(GL_TRIANGLES, vertexesToRender, GL_UNSIGNED_INT, nullptr);
+}
