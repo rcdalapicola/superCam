@@ -40,23 +40,20 @@ unsigned char* sc::mainGL(int windowWidth, int windowHeight)
     const int indexesElements =6;
 
     Buffer vertexesBuffer;
-    vertexesBuffer.bind();
     vertexesBuffer.data(vertexesElements * sizeof(float), vertexes);
 
-    glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
 
     IndexBuffer indexesBuffer;
-    indexesBuffer.bind();
     indexesBuffer.data(indexesElements * sizeof(float), indexes);
 
-    Shader shader(VertexShaderPath::BASIC, FragmentShaderPath::CIRCLE);
+    Shader shader(VertexShaderPath::BASIC, FragmentShaderPath::FRACTAL);
     shader.bind();
     
-    int location = glGetUniformLocation(shader.m_program, "u_Resolution");
-    glUniform2f(location, windowWidth, windowHeight);
+    auto resolution = shader.bindVariable("u_Resolution");
+    shader.uniform2f(resolution, windowWidth, windowHeight);
 
-    int colorLocation = glGetUniformLocation(shader.m_program, "u_Color");
+    auto color = shader.bindVariable("u_Color");
 
     float r = 0.0f;
     static const float increment = 0.01f;
@@ -67,7 +64,7 @@ unsigned char* sc::mainGL(int windowWidth, int windowHeight)
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUniform1f(colorLocation, r);
+        shader.uniform1f(color, r);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
     
         r += step;
@@ -75,10 +72,9 @@ unsigned char* sc::mainGL(int windowWidth, int windowHeight)
         context.process();
     }
     
-    GLubyte* pixels = new GLubyte[windowWidth * windowHeight * 3];  // RGB format
-    glReadPixels(0, 0, windowWidth, windowHeight, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+    auto* pixels = context.getImage();
 
-    return static_cast<unsigned char*>(pixels);
+    return pixels;
 }
 
 void sc::process(unsigned int image, int rows, int columns, int channels) {

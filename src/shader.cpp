@@ -93,3 +93,15 @@ int Shader::compileShader(unsigned int type, const std::string& source) {
 
     return id;
 };
+
+int Shader::bindVariable(const char* varName) {
+    return glGetUniformLocation(m_program, varName);
+}
+
+void Shader::uniform1f(int variable, float f1) {
+    glUniform1f(variable, f1);
+}
+
+void Shader::uniform2f(int variable, float f1, float f2) {
+    glUniform2f(variable, f1, f2);
+}

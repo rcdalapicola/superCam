@@ -28,9 +28,13 @@ class Shader {
     public:
         unsigned int m_program;
         Shader(const std::string& vertexShaderPath, const std::string& fragmentShaderPath);
-        Shader::~Shader();
+        ~Shader();
         void bind();
         void unbind();
+        int bindVariable(const char* varName);
+        void uniform1f(int variable, float f1);
+        void uniform2f(int variable, float f1, float f2);
+
 };
 
 #endif // SHADER_H

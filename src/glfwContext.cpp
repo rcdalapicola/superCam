@@ -15,7 +15,7 @@ glfwContext::~glfwContext() {
 };
 
 void glfwContext::newWindow(int width, int height, const char* name) {
-    window = glfwCreateWindow(width, height, name, NULL, NULL);
+    auto window = glfwCreateWindow(width, height, name, NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -28,6 +28,10 @@ void glfwContext::newWindow(int width, int height, const char* name) {
     {
         std::cout << "GLEW NOT INITIALIZED!\n";
     }
+
+    m_window = window;
+    m_width = width;
+    m_height = height;
 };
 
 void glfwContext::setSwapInterval(int interval) {
@@ -35,13 +39,20 @@ void glfwContext::setSwapInterval(int interval) {
 };
 
 bool glfwContext::isWindowOpen() {
-    return !glfwWindowShouldClose(window);
+    return !glfwWindowShouldClose(m_window);
 }
 
 void glfwContext::process() {
     /* Swap front and back buffers */
-    glfwSwapBuffers(window);
+    glfwSwapBuffers(m_window);
     
     /* Poll for and process events */
     glfwPollEvents();
+}
+
+unsigned char* glfwContext::getImage() {
+    unsigned char* pixels = new GLubyte[m_width * m_height * 3];  // RGB format
+    glReadPixels(0, 0, m_width, m_height, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+
+    return pixels;
 }

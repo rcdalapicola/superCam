@@ -3,10 +3,13 @@
 
 Buffer::Buffer() : arrayType(GL_ARRAY_BUFFER), id(0) {
     glGenBuffers(1, &id);
+    bind();
+    glEnableVertexAttribArray(0);
 };
 
 Buffer::Buffer(GLenum p_arrayType) : arrayType(p_arrayType), id(0) {
     glGenBuffers(1, &id);
+    bind();
 };
 
 IndexBuffer::IndexBuffer() : Buffer(GL_ELEMENT_ARRAY_BUFFER)

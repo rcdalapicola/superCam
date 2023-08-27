@@ -7,7 +7,9 @@
 
 class glfwContext final{
     private:
-        GLFWwindow* window;
+        GLFWwindow* m_window;
+        int m_width;
+        int m_height;
 
     public:
         glfwContext();
@@ -16,6 +18,7 @@ class glfwContext final{
         void setSwapInterval(int interval);
         bool isWindowOpen();
         void process();
+        unsigned char* getImage();
 };
 
 #endif // GLFWCONTEXT_H
